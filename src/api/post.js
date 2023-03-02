@@ -1,5 +1,6 @@
 import Axios from "axios";
 import Downloader from "../downloader.js";
+import { parse } from 'node-html-parser';
 
 export default class Post {
   id;
@@ -14,16 +15,31 @@ export default class Post {
     if (!this.data)
       await Axios.request({
         method: "GET",
+        url: `https://fantia.jp/posts/${this.id}`,
+        headers: {
+          Cookie: `_session_id=${process.env.SESSION_ID}`,
+        },
+      }).then(response => this.getInformation2(response));
+
+    return Promise.resolve(this.data);
+  }
+
+  async getInformation2(response) {
+    var HTMLParser = parse(response.data);
+    var token = this.getCsrfToken(HTMLParser);
+    if (!this.data)
+      await Axios.request({
+        method: "GET",
         url: `https://fantia.jp/api/v1/posts/${this.id}`,
         headers: {
           Cookie: `_session_id=${process.env.SESSION_ID}`,
+          "X-CSRF-Token": token,
         },
       }).then(response => {
         this.data = response.data.post;
         this.title = this.data.title;
       });
 
-    return Promise.resolve(this.data);
   }
 
   async getContents() {
@@ -100,5 +116,22 @@ export default class Post {
     }));
 
     console.log("Download success.");
+  }
+
+  getCsrfToken(html) {
+    var contentstr = 'content="'
+    var undefined;
+    var csrf_token = ""
+    get_token(html)
+    function get_token(html_sub){
+      if(html_sub.rawAttrs != undefined && html_sub.rawAttrs != "" && html_sub.rawAttrs.indexOf('csrf-token') != -1){
+        var idx = html_sub.rawAttrs.indexOf(contentstr)
+        csrf_token = html_sub.rawAttrs.substr(idx+contentstr.length).split('"')[0];
+      }
+      for (let i = 0; i < html_sub.childNodes.length; i++) {
+        get_token(html_sub.childNodes[i]);
+      }
+    }
+    return csrf_token;
   }
 }
