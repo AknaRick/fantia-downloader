@@ -45,4 +45,4 @@ Backward, means it will go to **previous** post after current post downloaded (T
 
 On windows, there are some characters are forbidden in a file or directory name, so I replaced them into `+` character.
 
-Following characters will be replaced into `+` character: `/`, `\`, `?`, `%`, `*`, `:`, `|`, `"`, `<`, `>`.
+Following characters will be replaced into `+` character: `/`, `\`, `?`, `%`, `*`, `:`, `|`, `"`, `<`, `>`, `.`.

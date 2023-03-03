@@ -52,5 +52,5 @@ function getDirection() {
 }
 
 String.prototype.replaceIllegalPathCharacters = function () {
-  return this.replace(/[/\\?%*:|"<>]/g, "+");
+  return this.replace(/[/\\?%*:|"<>.]/g, "+");
 };
